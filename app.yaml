@@ -1,0 +1,41 @@
+application: thedada99
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /static
+  static_dir: static
+  
+- url: /images
+  static_dir: images
+  
+- url: /css
+  static_dir: css
+  
+- url: /js
+  static_dir: js
+  
+- url: /home
+  script: home.py
+  login: admin
+  
+  
+- url: /home/.*
+  script: home.py
+  login: admin  
+  
+- url: /guestbook
+  script: guest.py
+  
+- url: /guestbook/.*
+  script: guest.py  
+  
+  
+  
+- url: /.*
+  script: asklogin.py
+  
+
+  

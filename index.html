@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<link rel="stylesheet" href="/static/style-new.css" type="text/css" media="screen"/>
+        <!--#html5forie.js 针对不支持HTML最新tag的浏览器来手工创建它们.--> 
+		<!--[if IE]>  
+		<script type="text/javascript" src="/js/html5forie.js"></script>
+		<![endif]-->  
+		
+		<script type="text/javascript" src="/js/jquery.js"></script>
+		<!-- #html5forie.css 针对不支持HTML最新tag的浏览器来手工创建它们.--> 
+		<link rel="stylesheet" media="screen" type="text/css" href="/css/html5forie.css"/>
+		
+		<script>
+    
+
+    function check(){
+		/*在提交时检查输入框是否为空，如果为空，将使用alert提醒用户 。flag变量用于控制所有的输入框是否为有效值，一旦一个为空，将
+		 flag 设置为false。
+		 */
+		 
+		 var flag='true';
+		 $('#expense input').each(function(index,e){
+		 	    /*在这里使用正则表达式（this.value.replace(/\s/gi,"")）来替换空格输入，以防止输入为空格。 */
+			 	var textValue = this.value.replace(/\s/gi,"");
+				if(textValue==""){
+					
+					alert(this.name+" 不能为空");
+					flag='false';
+					$(this).css('background-color','#53d99c')
+					
+				}
+				
+						
+			 });
+		//alert('final:'+flag);	 
+		 if(flag=='true'){
+			//var reg = new RegExp("^[0-9]+(.[0-9]{2})?$", "g");
+			//var num = $('#num').val()*100;
+			//num.length;
+		 	//$('#expense').submit();
+		 	//将num的数字转变为带两位小数点的float类型。
+		 	var num =$('#num').val().split(".");
+		 	
+		 	if(num.length==2)
+		 		{
+		 	    //alert(num[0]+"."+num[1].substr(0,2));
+		 		//$('#expense').submit();
+		 		}
+		 	if(num.length==1)
+		 		{
+		 		//alert(num[0]+".00");	
+		 		$('#num').val(num[0]+".00");
+		 		}
+		 	$('#expense').submit();
+		 }
+	}
+    
+			
+		</script>
+		
+		
+		<title>Expense</title>
+	</head>
+
+	<body>
+<div class="body">
+   
+   <div class="leftmenu"></div>
+   <div class="content">
+	<form action="/home" method="post" name="expense" id="expense">
+		
+      <fieldset class="step">
+	   	<legend>Expense</legend>	
+     <p class="input">
+     	<span class="i_item"><label>日期</label>
+		<input class="date_input" name="date" value="{{today}}"/></span>
+		<span class="i_item" >
+		<label>描述</label>
+		<input id="descript" name="descript" />
+		</span>
+        </p  class="input">
+
+
+	 
+
+	 
+	    <p class="input">
+     	<span class="i_item" >
+		<label>金额</label>
+		<input id="num" name="num" />
+		</span>
+		<span class="i_item" >
+		<label>类别</label>
+		<select name="cate">
+	{% for item in items %}
+     
+      <option>{{item.name}}</option>
+
+    {% endfor %}
+		
+		
+		</select>
+		</span>
+     </p>
+     
+	 <button onclick="check()" type="button">Add</button>
+    </fieldset>
+		
+  
+       </form>
+    </div>
+   <div class="content" id="content2">
+   <div class="wrapper">
+    <h2>支出：<span id="totalmonth">{{totalmonth}}</span></h2>
+    <ul class="list">
+   	{% for item1 in items2 %}
+     
+      <li id='{{item1.key}}'><span>{{item1.date}}</span><span>{{item1.descript}}</span><span>{{item1.cate}}</span><span>{{item1.num}}</span><span class="delete" title="删除" ></span></li>
+
+    {% endfor %}
+    </ul>
+    </div>
+    </div>
+</div>
+	</body>
+<script type="text/javascript" src="/js/jquery.date_input.js"></script>
+<link rel="stylesheet" media="screen" type="text/css" href="/css/date_input.css	"/>
+<script type="text/javascript">
+$($.date_input.initialize);
+jQuery.extend(DateInput.DEFAULT_OPTS, {
+	  month_names: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+	  short_month_names: ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"],
+	  short_day_names: ["一", "二", "三", "四", "五", "六", "日"]
+	});
+
+$('.delete').click(function(){
+	var id=$(this).parent().attr('id');
+	var bln = window.confirm("删除这条记录吗?");  
+	if(bln){
+		deleteitem(id);
+		
+	}
+});
+
+var deleteitem = function(id){
+	$.ajax({
+		   url: "/home",
+		   global: false,
+		   data: id,
+		   type: "DELETE",
+		   success: function(msg){
+			   refreshtotal();
+			   $('#'+id).fadeOut('slow');
+			   
+		   }
+
+		 });
+
+	
+	
+}
+
+var refreshtotal = function(){
+	$.ajax({
+		   url: "/home/expense",
+		   global: false,
+		   data: "total=true",
+		   type: "GET",
+		   success: function(msg){
+			   //alert(msg);
+			   $('#totalmonth').text(msg);
+		   }
+
+		 });
+	
+	
+  }
+
+</script>	
+</html>

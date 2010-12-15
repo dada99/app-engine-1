@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="/css/fileuploader.css" rel="stylesheet" type="text/css">	
+</head>
+<body>		
+	
+	<div id="demo"></div>
+	<ul id="separate-list"></ul>
+    
+    <script src="/js/fileuploader.js" type="text/javascript"></script>
+    <script>        
+        function createUploader(){            
+            var uploader = new qq.FileUploader({
+                element: document.getElementById('demo'),
+                listElement: document.getElementById('separate-list'),
+                debug: true,
+                action: '/home/upload',
+               
+            });           
+        }        
+        window.onload = createUploader;     
+    </script>    
+    <form action="/home/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file"/>
+    <input type="submit" />
+    </form>
+    
+{% for item in items %}
+     
+<div><img src='images?img_id={{item.key}}' /></div>
+
+{% endfor %}
+</body>
+</html>
