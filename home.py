@@ -59,7 +59,7 @@ class Home(webapp.RequestHandler):
             totalmonth+=exp.num
         today = datetime.datetime.today().isoformat()[:10]
         items = db.GqlQuery(query_str)
-        items2 = db.GqlQuery(query_str2,)
+        items2 = db.GqlQuery(query_str2,(datetime.datetime(2010,12,01),datetime.datetime(2010,12,31)))
         
        
         template_values = {
