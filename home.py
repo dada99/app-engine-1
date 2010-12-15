@@ -42,32 +42,43 @@ class Home(webapp.RequestHandler):
         begin=''
         end=''
         if(self.request.get("yearandmon")):
+            #yearandmon 是YYYY-M or YYYY-MM 的形式
             yearandmon = self.request.get("yearandmon")
-            year=yearandmon[:4]
-            mon=yearandmon[4:6]
-            begin=year+'-'+mon+'-00'
-            end=year+'-'+mon+'-31'
+            yearandmon=yearandmon.encode('utf-8').split('-')
             
+            year=int(yearandmon[0])
+            mon=int(yearandmon[1])
+            
+            begin=datetime.date(year,mon,01)
+            
+            if(mon==12):
+                end=datetime.date(year+1,1,01)
+            else:
+                end=datetime.date(year,mon+1,01)    
+            #如果月份为12月，那么end就要变成下一年的1月1日。
         query_str = "SELECT * FROM Category"
         if(begin!='' and end!=''):
-            query_str2 = "SELECT * FROM Expense where date > :1 and date < :2 order by date DESC" 
-            #query_str2 = "SELECT * FROM Expense where num = %f"  % float(90.0)
-            #self.response.out.write(query_str2)
-        #else:
-            #query_str2 = "SELECT * FROM Expense order by date DESC"            
-        for exp in Expense.gql("where date = :1",datetime.datetime(2010,12,13)):
+            #items2 = db.GqlQuery("SELECT * FROM Expense where date > '%s' and date < '%s' order by date DESC" % (datetime.date(2010,9,1),datetime.date(2010,10,1)))
+            items2 =  Expense.gql("where date > :1 and date < :2",begin,end)
+            #注意gql搜索的写法，qgl(query,arg1,arg2,....),基本放弃GqlQuery，：《
+            
+        else:
+            items2 = db.GqlQuery("SELECT * FROM Expense order by date DESC")            
+        for exp in items2:
             totalmonth+=exp.num
+        #总计的金额根据返回条目来计算，如果是月视图，就计算当月的花费            
         today = datetime.datetime.today().isoformat()[:10]
         items = db.GqlQuery(query_str)
-        items2 = db.GqlQuery(query_str2,(datetime.datetime(2010,12,01),datetime.datetime(2010,12,31)))
-        #new line added
+        
+        
         
        
         template_values = {
             'items': items, 
             'items2':items2,
             'today': today, 
-            'totalmonth': totalmonth   
+            'totalmonth': totalmonth,
+            'monlist':  monlist
         } 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
