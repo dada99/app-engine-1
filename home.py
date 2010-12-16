@@ -67,7 +67,9 @@ class Home(webapp.RequestHandler):
         for exp in items2:
             totalmonth+=exp.num
         #总计的金额根据返回条目来计算，如果是月视图，就计算当月的花费            
-        today = datetime.datetime.today().isoformat()[:10]
+        todayfull = datetime.datetime.today().isoformat()
+        today=todayfull[:10]
+        
         items = db.GqlQuery(query_str)
         
         
@@ -78,7 +80,7 @@ class Home(webapp.RequestHandler):
             'items2':items2,
             'today': today, 
             'totalmonth': totalmonth,
-            'monlist':  monlist
+            
         } 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
