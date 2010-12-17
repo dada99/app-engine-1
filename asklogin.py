@@ -18,11 +18,11 @@ SIG_METHOD = 'gdata.auth.OAuthSignatureMethod.HMAC_SHA1'
         
 class GOauth1(webapp.RequestHandler): 
     def get(self):
-        
+        client = gdata.docs.service.DocsService(source=CONSUMER_KEY)
         
         if(self.request.get('oauth_token')==''):
             session = Session()
-            client = gdata.docs.service.DocsService(source=CONSUMER_KEY)
+            
             client.SetOAuthInputParameters(gdata.auth.OAuthSignatureMethod.HMAC_SHA1, CONSUMER_KEY, consumer_secret=CONSUMER_SECRET)
             req_token = client.FetchOAuthRequestToken()
             session['oauth_token_secret'] = req_token.secret
@@ -37,7 +37,7 @@ class GOauth1(webapp.RequestHandler):
         else:
             session = Session()
             oauth_token = gdata.auth.OAuthTokenFromUrl(self.request.uri)
-            client = gdata.docs.service.DocsService(source=CONSUMER_KEY)
+            
             if oauth_token:
                 
                 oauth_token.secret = session['oauth_token_secret']
@@ -47,49 +47,23 @@ class GOauth1(webapp.RequestHandler):
                 client.SetOAuthToken(oauth_token)
                 #print client._oauth_input_params
                 access_token = client.UpgradeToOAuthAccessToken()
-                if access_token and users.get_current_user():
-                    client.token_store.add_token(access_token)
-                elif access_token:
-                    client.current_token = access_token
-                    client.SetOAuthToken(access_token)
-                #client.SetOAuthToken(access_token)
-                client = gdata.docs.service.DocsService() 
-                client.SetOAuthInputParameters(SIG_METHOD, CONSUMER_KEY, consumer_secret=CONSUMER_SECRET)
+                session['access_token']=access_token
+                #client.SetOAuthInputParameters(SIG_METHOD, CONSUMER_KEY, consumer_secret=CONSUMER_SECRET)
                 #client1.SetOAuthToken(gdata.auth.OAuthToken(key=access_token.key, secret=access_token.secret))
-                oauth_input_params = gdata.auth.OAuthInputParams(gdata.auth.OAuthSignatureMethod.HMAC_SHA1,CONSUMER_KEY, consumer_secret=CONSUMER_SECRET) 
-                oauth_token = gdata.auth.OAuthToken(key=access_token.key, secret=access_token.secret, oauth_input_params=oauth_input_params) 
-                client.SetOAuthToken(oauth_token) 
-                feed = client.GetDocumentListFeed()
-                for entry in feed.entry:
-                    print entry.title.text
-
-
-
-                
-                
-                
-                
-       
+                #oauth_input_params = gdata.auth.OAuthInputParams(gdata.auth.OAuthSignatureMethod.HMAC_SHA1,CONSUMER_KEY, consumer_secret=CONSUMER_SECRET) 
+                #oauth_token = gdata.auth.OAuthToken(key=access_token.key, secret=access_token.secret, oauth_input_params=oauth_input_params) 
+                #client.SetOAuthToken(oauth_token) 
+                #feed = client.GetDocumentListFeed()
                 #for entry in feed.entry:
                     #print entry.title.text
 
-
-                
+                self.redirect('/')
                 
             else:
                 print 'No oauth_token found in the URL'    
 
 
 
-           
-
-
-            
-
-            
-            
-
-       
         
 class MainPage(webapp.RequestHandler):
     
@@ -105,10 +79,21 @@ class MainPage(webapp.RequestHandler):
                 'Please <a href="%s">Sign in</a>,for further process' % 
                 users.create_login_url("/")
             )
-        self.response.out.write('Go to <a href="/goauth">Google OAuth Sample</a>')
+        self.response.out.write('Go to <a href="/goauth">Google OAuth Sample</a><br />')
         
         #else:
-            
+        session = Session()
+        if(session['access_token']):
+            access_token=session['access_token']
+            client = gdata.docs.service.DocsService() 
+            client.SetOAuthInputParameters(SIG_METHOD, CONSUMER_KEY, consumer_secret=CONSUMER_SECRET)
+            #client1.SetOAuthToken(gdata.auth.OAuthToken(key=access_token.key, secret=access_token.secret))
+            oauth_input_params = gdata.auth.OAuthInputParams(gdata.auth.OAuthSignatureMethod.HMAC_SHA1,CONSUMER_KEY, consumer_secret=CONSUMER_SECRET) 
+            oauth_token = gdata.auth.OAuthToken(key=access_token.key, secret=access_token.secret, oauth_input_params=oauth_input_params) 
+            client.SetOAuthToken(oauth_token) 
+            feed = client.GetDocumentListFeed()
+            for entry in feed.entry:
+                self.response.out.write(entry.title.text+'<br/>')  
             
 #OAuth Consumer Key:     thedada99.appspot.com
 #OAuth Consumer Secret:     YSn7voZOD7XiEGIJdTCs6xbi  
