@@ -362,7 +362,7 @@ class Session(object):
 
     COOKIE_NAME = 'appengine-utilities-session-sid' # session token
     DEFAULT_COOKIE_PATH = '/'
-    SESSION_EXPIRE_TIME = 7200 # sessions are valid for 7200 seconds (2 hours)
+    SESSION_EXPIRE_TIME = 72000 # sessions are valid for 7200 seconds (2 hours)
     CLEAN_CHECK_PERCENT = 50 # By default, 50% of all requests will clean the database
     INTEGRATE_FLASH = True # integrate functionality from flash module?
     CHECK_IP = True # validate sessions by IP
