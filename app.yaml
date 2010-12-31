@@ -16,6 +16,9 @@ handlers:
   
 - url: /js
   static_dir: js
+
+- url: /dwpv
+  script: dwgetpv.py    
   
 - url: /home
   script: home.py
@@ -32,7 +35,7 @@ handlers:
 - url: /guestbook/.*
   script: guest.py  
   
-  
+
   
 - url: /.*
   script: asklogin.py

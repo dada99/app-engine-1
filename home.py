@@ -42,7 +42,7 @@ class Home(webapp.RequestHandler):
         begin=''
         end=''
         if(self.request.get("yearandmon")):
-            #yearandmon 是YYYY-M or YYYY-MM 的形式
+            #yearandmon is YYYY-M or YYYY-MM format
             yearandmon = self.request.get("yearandmon")
             yearandmon=yearandmon.encode('utf-8').split('-')
             
