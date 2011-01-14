@@ -35,6 +35,8 @@ handlers:
 - url: /guestbook/.*
   script: guest.py  
   
+- url: /django/.*
+  script: main.py  
 
   
 - url: /.*

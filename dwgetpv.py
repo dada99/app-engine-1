@@ -5,7 +5,7 @@ Created on 2010-12-31
 '''
 
 import os
-
+from google.appengine.api.urlfetch import DownloadError 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -21,7 +21,7 @@ class Dwgetpv(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'dwgetpv.html')
         self.response.out.write(template.render(path, template_values))
          
-    def post(self):      
+    def post1(self):      
         urlgroup = self.request.get('url')
         urls=urlgroup.split('\r\n')
         out = findpv.findpv(urls)
@@ -35,8 +35,12 @@ class Dwgetpv(webapp.RequestHandler):
         } 
         path = os.path.join(os.path.dirname(__file__), 'dwgetpv.html')
         self.response.out.write(template.render(path, template_values))
+    def post(self):    
+        url = self.request.body
         
-        
+        out = findpv.findpv(url)
+        self.response.out.write(out) 
+        #return out
     
 application = webapp.WSGIApplication([('/dwpv',Dwgetpv),], debug=True)
 

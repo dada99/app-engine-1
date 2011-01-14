@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <style>
 .body {
 width:750px;
@@ -9,29 +10,67 @@ margin:auto;
 }
 
 </style>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script><!--
+function getpv(){
+    if($("#body").text()!=""){
+    	$("#body").text(" ");	
+    }	
+	var urls = $("#url").val().split('\n');
+	//alert(urls.length)
+	for(i=0;i<urls.length;i++)
+		{
+		fetchpv(urls[i]);
+		
+		}
+	
+}
+
+function fetchpv(url){
+	
+	$.ajax({
+		   url: "/dwpv",
+		   global: false,
+		   data: url,
+		   type: "POST",
+		   success: function(num){
+		   $("#body").append(url+"	"+num+"<br />");	   
+		   
+			   
+		   }
+
+		 });
+	
+}
+</script>
+
 <title>Get PV of dW Content</title>
 </head>
 <body>
 <div class="body">
    
    
-   <div class="content">
-	<form action="/dwpv" method="post" name="dwpv" id="dwpv">
+   
+
 		
       <fieldset class="title">
 	   	<legend>Get PV of dW Content V0.1</legend>	
-     <textarea rows="25" cols="90" name="url"></textarea>
+     <textarea rows="25" cols="90" name="url" id="url"></textarea>
      
-	 <input type="submit" title="submit">
+	 <button id="button" onclick="getpv()">提交查询</button>
+	 
     </fieldset>
 		
   
-       </form>
+   
 </div>
-<div class="body">
+
+<div class="body" id="body">
+
 {% for i in output %}
-{{i.url}}"--------"{{i.pv}}<br />
+{{i.url}}   {{i.pv}}<br />
 {% endfor %}
 </div>
+
 </body>
 </html>

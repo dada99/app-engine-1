@@ -3,9 +3,13 @@ Created on 2010-12-1
 
 @author: liuda
 '''
-# coding=utf-8
 
-#from google.appengine.api import users
+
+# -*- coding: utf-8 -*-
+
+
+
+
 import time
 import datetime
 from google.appengine.ext import webapp
@@ -54,19 +58,19 @@ class Home(webapp.RequestHandler):
             if(mon==12):
                 end=datetime.date(year+1,1,01)
             else:
-                end=datetime.date(year,mon+1,01)    
-            #如果月份为12月，那么end就要变成下一年的1月1日。
+                end=datetime.date(year,mon+1,01) 
+        
         query_str = "SELECT * FROM Category"
         if(begin!='' and end!=''):
             #items2 = db.GqlQuery("SELECT * FROM Expense where date > '%s' and date < '%s' order by date DESC" % (datetime.date(2010,9,1),datetime.date(2010,10,1)))
             items2 =  Expense.gql("where date > :1 and date < :2",begin,end)
-            #注意gql搜索的写法，qgl(query,arg1,arg2,....),基本放弃GqlQuery，：《
+            
             
         else:
             items2 = db.GqlQuery("SELECT * FROM Expense order by date DESC")            
         for exp in items2:
             totalmonth+=exp.num
-        #总计的金额根据返回条目来计算，如果是月视图，就计算当月的花费            
+            
         todayfull = datetime.datetime.today().isoformat()
         today=todayfull[:10]
         
@@ -162,7 +166,7 @@ class Addcate(webapp.RequestHandler):
         self.redirect('/home/addcate')         
          
 
-application = webapp.WSGIApplication([('/home',Home),('/home/',Home),('/home/addcate',Addcate),('/home/upload',Upload),('/home/images',Image),('/home/expense',Expense)], debug=True)
+application = webapp.WSGIApplication([('/home',Home),('/home/',Home),('/home/addcate',Addcate),('/home/images',Image),('/home/expense',Expense)], debug=True)
 
 
 def main():

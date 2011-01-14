@@ -29,6 +29,21 @@ SIG_METHOD = 'gdata.auth.OAuthSignatureMethod.HMAC_SHA1'
         #self.redirect('/')
 client = gdata.contacts.service.ContactsService()
 
+from google.appengine.api import urlfetch
+
+def get_country(self):
+        try:
+            raw = urlfetch.fetch("http://api.hostip.info/get_html.php?ip="+self.request.remote_addr)
+        except:
+            return "XX"
+        country = ""
+        try:
+            country = raw.content.split('(')[1]
+            country = country.split(')')[0]
+        except:
+            country = "XX"
+        return country
+
 class GOauth1(webapp.RequestHandler): 
     def get(self):
         
@@ -183,14 +198,44 @@ class MainPage(webapp.RequestHandler):
             
 #OAuth Consumer Key:     thedada99.appspot.com
 #OAuth Consumer Secret:     YSn7voZOD7XiEGIJdTCs6xbi  
-       
-              
+from myuser import Myuser       
+class Sessiontest(webapp.RequestHandler): 
+    def get(self):
+        #user = Myuser()
+        #if(self.request.get('set')=='true'):
+        #out = user.set_user_cookie()                    
+        self.response.out.write(self.request.cookies)
+        #out = user.get_current_user()
+        #self.response.headers._headers.append(('Set-Cookie',out.output(header='')))
+
+from google.appengine.ext.webapp import template
+from home import Img        
         
+class Upload(webapp.RequestHandler):
+    def get(self):
+        query_str = "SELECT * FROM Img"
+        greetings = db.GqlQuery (query_str)
+
+        template_values = {
+            'items': greetings,          
+        } 
+        path = os.path.join(os.path.dirname(__file__), 'upload.htm')
+        self.response.out.write(template.render(path, template_values))
+        
+    def post(self):
+        
+        img=Img()
+
+        
+        img.file=db.Blob(self.request.body)
+        img.put()
+        #return 'success'
+        #self.redirect('/home/upload')        
         
               
 
 
-application = webapp.WSGIApplication([('/', MainPage),('/goauth',GOauth1),('/goauth2',GOauth2)], debug=True)
+application = webapp.WSGIApplication([('/', MainPage),('/goauth',GOauth1),('/goauth2',GOauth2),('/sessiontest',Sessiontest),('/upload',Upload),], debug=True)
 
 
 def main():
